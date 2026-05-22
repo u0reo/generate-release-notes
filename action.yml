@@ -1,0 +1,30 @@
+name: Generate Release Notes
+description: Git タグ間のコミット・PR 一覧からリリースノートを生成
+author: u0reo
+branding:
+  icon: file-text
+  color: blue
+
+inputs:
+  tag:
+    description: 'リリースノートを生成するタグ名 (例: v1.2.3)'
+    required: true
+  token:
+    description: 'GitHub トークン (PR 情報取得に使用)'
+    required: true
+
+outputs:
+  notes-file:
+    description: '生成されたリリースノートのファイルパス'
+    value: ${{ steps.main.outputs.notes-file }}
+
+runs:
+  using: composite
+  steps:
+    - name: Generate release notes
+      id: main
+      shell: sh
+      env:
+        TAG: ${{ inputs.tag }}
+        GITHUB_TOKEN: ${{ inputs.token }}
+      run: ${{ github.action_path }}/main.sh
