@@ -23,7 +23,7 @@ pr_numbers=$(git log "$range" --pretty=format:'%s' \
   echo
   echo '<details><summary>コミットログ（クリックで展開）</summary>'
   echo
-  git log "$range" --pretty=format:'- %s (%h) by %an'
+  git log "$range" --pretty=tformat:'- %s (%h) by %an%w(0,2,2)%+b'
   echo
   echo '</details>'
   echo
@@ -34,10 +34,10 @@ pr_numbers=$(git log "$range" --pretty=format:'%s' \
       if [ -z "$num" ]; then continue; fi
 
       pr_json=$(curl -s -H "Authorization: Bearer ${GITHUB_TOKEN}" "${GITHUB_API_URL}/repos/${repo}/pulls/${num}")
-      title=$(echo "$pr_json" | jq -r .title)
-      user=$(echo "$pr_json" | jq -r .user.login)
+      title=$(echo "$pr_json" | jq -r '.title // empty')
+      user=$(echo "$pr_json" | jq -r '.user.login // empty')
 
-      echo "- [#${num}](${GITHUB_SERVER_URL}/${repo}/pull/${num}) ${title} by @${user}"
+      echo "- [#${num}](${GITHUB_SERVER_URL}/${repo}/pull/${num}) ${title:-（タイトル取得失敗）} by @${user:-unknown}"
     done
   else
     echo '- 該当するプルリクエストはありません'
